@@ -17,7 +17,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'your-fallback-secret-key')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Allow Render or custom domains
-ALLOWED_HOSTS = ['civicpulse.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['civicpulse-3kg8.onrender.com', 'localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
