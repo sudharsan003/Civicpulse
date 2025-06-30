@@ -59,7 +59,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'civicpulse_project.wsgi.application'
+WSGI_APPLICATION = 'civicpulse.wsgi.application'
 
 # Use PostgreSQL via dj-database-url
 DATABASES = {
