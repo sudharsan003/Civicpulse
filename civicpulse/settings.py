@@ -41,7 +41,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'civicpulse_project.urls'
+ROOT_URLCONF = 'civicpulse.urls'
 
 TEMPLATES = [
     {
