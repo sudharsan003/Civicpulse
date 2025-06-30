@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Report Issue - Civics Pulse</title>
+  <link rel="stylesheet" href="{% static 'css/submit_issue.css' %}" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="logo">
+      <img src="{% static 'images/logo.png' %}" alt="Logo">
+    </div>
+    <div class="nav-links">
+      <a href="{% url 'issue_list' %}">Home</a>
+      <a href="{% url 'my_issues' %}">My Reports</a>
+      <a href="{% url 'issue_map' %}">Map</a>
+      <a href="{% url 'logout' %}">Logout</a>
+    </div>
+  </div>
+
+  <!-- Form Section -->
+  <div class="main-container">
+    <div class="form-container">
+      <h2>Report Issue</h2>
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label>Title</label>
+        <input type="text" name="title" placeholder="E.g. Pothole on Elm Street" required>
+
+        <label>Description</label>
+        <textarea name="description" rows="4" placeholder="Describe the issue..." required></textarea>
+
+        <label>Category</label>
+        <select name="category" required>
+          <option value="">-- Select Category --</option>
+          {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label>City</label>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <input type="text" id="city" name="location" placeholder="Enter your city..." required style="flex: 1; min-width: 250px; padding: 8px;">
+        <button type="button" onclick="detectCity()" style="
+        padding: 8px 12px;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        height: 42px;
+        ">📍 Use My Location</button>
+      </div>
+      <small style="color: gray;">You can type your city name or click the button to auto-detect it.</small>
+
+
+        <label>Upload Images (Max 5)</label>
+        <input type="file" name="images" accept="image/*" multiple onchange="limitFiles(this)">
+        <p class="note">You can upload up to 5 images.</p>
+
+        <label>Mark Exact Location</label>
+        <div id="map"></div>
+
+        <input type="hidden" name="latitude" id="lat">
+        <input type="hidden" name="longitude" id="lng">
+
+        <button type="submit">Submit Report</button>
+      </form>
+    </div>
+    <div class="illustration-container">
+      <img src="{% static 'images/submit-illustration.png' %}" alt="Report Illustration">
+    </div>
+  </div>
+
+  <!-- JS -->
+<script>
+  // Initialize Leaflet map
+  var map = L.map('map', { attributionControl: false }).setView([13.0827, 80.2707], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+  // Marker handling
+  var marker;
+  map.on('click', function(e) {
+    if (marker) map.removeLayer(marker);
+    marker = L.marker(e.latlng).addTo(map);
+    document.getElementById('lat').value = e.latlng.lat;
+    document.getElementById('lng').value = e.latlng.lng;
+  });
+
+  // Limit file uploads to 5
+  function limitFiles(input) {
+    const max = 5;
+    const files = input.files;
+    if (files.length > max) {
+      alert(`You can only upload up to ${max} images.`);
+      input.value = "";
+    }
+  }
+  
+  function detectCity() {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      document.getElementById('lat').value = lat;
+      document.getElementById('lng').value = lon;
+
+      // Set marker and center map
+      if (map) {
+        if (marker) map.removeLayer(marker);
+        marker = L.marker([lat, lon]).addTo(map);
+        map.setView([lat, lon], 14);
+      }
+
+      // Reverse geocode to get city name
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+        .then(response => response.json())
+        .then(data => {
+          const city = data.address.city || data.address.town || data.address.village || data.address.county || "Unknown";
+          document.getElementById('city').value = city;
+        })
+        .catch(error => {
+          console.error("Error detecting location:", error);
+          alert("Could not detect city automatically.");
+        });
+    }, function(error) {
+      alert("Permission denied or location unavailable.");
+    });
+  }
+
+
+</script>
+
+  
+</body>
+</html>

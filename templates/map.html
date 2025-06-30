@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CivicPulse – Civic Map</title>
+  <link rel="stylesheet" href="{% static 'css/map.css' %}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="logo">
+      <img src="{% static 'images/logo.png' %}" alt="Logo">
+    </div>
+    <div class="nav-links">
+      <a href="{% url 'issue_list' %}">Home</a>
+      <a href="{% url 'submit_issue' %}">Report Issue</a>
+      <a href="{% url 'my_issues' %}">My Reports</a>
+      <a href="{% url 'logout' %}">Logout</a>
+    </div>
+  </div>
+
+  <!-- Title -->
+  <h2>🗺️ Civic Issues Map</h2>
+
+  <!-- Map Container -->
+  <div id="map"></div>
+
+  <!-- Map JS -->
+  <script>
+    const map = L.map('map').setView([13.0827, 80.2707], 11);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    fetch("{% url 'issue_data' %}")
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(issue => {
+          if (issue.latitude && issue.longitude) {
+            const marker = L.marker([issue.latitude, issue.longitude]).addTo(map);
+            marker.bindPopup(`
+              <strong>${issue.title}</strong><br>
+              Status: ${issue.status}
+            `);
+          }
+        });
+      })
+      .catch(error => {
+        console.error("Error loading issue data:", error);
+      });
+
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 400);
+  </script>
+
+</body>
+</html>

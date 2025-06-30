@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{{ issue.title }} - CivicPulse</title>
+
+  <!-- ✅ Custom CSS -->
+  <link rel="stylesheet" href="{% static 'css/issue_detail.css' %}">
+
+  <!-- ✅ Leaflet for Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+  <!-- ✅ Lightbox Gallery -->
+  <link rel="stylesheet" href="{% static 'lightbox/lightbox.css' %}">
+  <script src="{% static 'lightbox/lightbox.js' %}"></script>
+
+  <!-- ✅ jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+<body>
+   <div class="navbar">
+  <div class="logo">
+    <img src="{% static 'images/logo.png' %}" alt="Logo">
+  </div>
+  <div class="nav-links">
+    <a href="{% url 'issue_list' %}">Home</a>
+    <a href="{% url 'submit_issue' %}">Report Issue</a>
+    <a href="{% url 'my_issues' %}">My Reports</a>
+    <a href="{% url 'issue_map' %}">Map</a>
+    <a href="{% url 'logout' %}">Logout</a>
+  </div>
+</div>
+
+  <div class="main-container">
+  <!-- 🧾 Issue Info -->
+  <h1>{{ issue.title }}</h1>
+  <p>{{ duration_text }}</p>
+  <p><strong>Status:</strong> {{ issue.status }}</p>
+  <p><strong>Reported by:</strong> {{ issue.created_by.username }} on {{ issue.created_at }}</p>
+  {% if issue.resolved_at %}
+    <p><strong>Resolved on:</strong> {{ issue.resolved_at }}</p>
+  {% endif %}
+  <p>{{ issue.description }}</p>
+  {% if issue.category %}
+    <p><strong>Category:</strong> {{ issue.category.name }}</p>
+  {% endif %}
+  <p><strong>Location:</strong> {{ issue.location }}</p>
+
+  <!-- 🗺️ Map -->
+  <div id="map" style="height: 300px; margin-bottom: 20px;"></div>
+
+  <script>
+  var map = L.map('map').setView([{{ issue.latitude }}, {{ issue.longitude }}], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  L.marker([{{ issue.latitude }}, {{ issue.longitude }}])
+    .addTo(map)
+    .bindPopup("{{ issue.title }}")
+    .openPopup();
+</script>
+
+
+  <!-- 🖼️ Image Gallery -->
+  <div class="gallery">
+    {% for img in issue.images.all %}
+      <a href="{{ img.image.url }}" data-lightbox="issue">
+        <img src="{{ img.image.url }}" width="120" style="margin: 5px; border-radius: 4px;">
+      </a>
+    {% endfor %}
+  </div>
+
+  <!-- 💬 Comments -->
+  <div id="comments">
+    <h3>Comments</h3>
+    <ul id="comment-list">
+      {% for c in top_level_comments %}
+        <li id="c-{{ c.id }}">
+          <strong>{{ c.author.username }}</strong>: {{ c.text }}
+          <a href="#" class="reply-toggle" data-id="{{ c.id }}">Reply</a>
+          <ul id="children-{{ c.id }}">
+            {% for r in c.replies.all %}
+              <li id="c-{{ r.id }}"><strong>{{ r.author.username }}</strong>: {{ r.text }}</li>
+            {% endfor %}
+          </ul>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <!-- ✍️ New Comment Form -->
+    <form id="c-form" data-issue="{{ issue.id }}">
+      {% csrf_token %}
+      <textarea name="text" required placeholder="Add a comment..." rows="3" style="width: 100%;"></textarea><br>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+  </div>
+
+  <!-- 🔁 JavaScript for Comments -->
+  <script>
+    // Toggle Reply Form
+    $('.reply-toggle').click(function(e) {
+      e.preventDefault();
+      var box = $('<form class="reply-form" data-issue="{{ issue.id }}" data-parent="'+$(this).data('id')+'">'+
+        '{% csrf_token %}<textarea name="text" required placeholder="Reply..." rows="2" style="width: 100%;"></textarea>'+
+        '<button type="submit">Submit</button></form>');
+      $('#c-' + $(this).data('id')).append(box);
+      $(this).remove();
+    });
+
+    // Add Comment to Page
+    function insertComment(res){
+      var html = '<li id="c-'+res.id+'"><strong>'+res.author+'</strong>: '+res.text+'</li>';
+      if(res.parent_id){
+        $('#children-' + res.parent_id).append(html);
+      } else {
+        $('#comment-list').append(html);
+      }
+    }
+
+    // Submit New Comment or Reply
+    $(document).on('submit', '.reply-form, #c-form', function(e){
+      e.preventDefault();
+      var f = $(this), issue = f.data('issue'), parent = f.data('parent') || '';
+      $.post("{% url 'ajax_post_comment' %}", f.serialize() + '&issue_id='+issue+'&parent_id='+parent, function(res){
+        insertComment(res);
+        f.find('textarea').val('');
+        if(parent) f.remove();  // Remove reply form after submit
+      });
+    });
+  </script>
+
+</body>
+</html>

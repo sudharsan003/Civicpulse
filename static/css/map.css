@@ -1,0 +1,77 @@
+/* === Unified CivicPulse Map Styles === */
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f8f9fb;
+}
+
+/* Navbar */
+.navbar {
+  background-color: white;
+  padding: 6px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  height: 50px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  height: 70px;
+}
+
+.logo img {
+  width: auto;
+  max-width: 100px;
+  object-fit: contain;
+  display: block;
+}
+
+.nav-links a {
+  margin-left: 25px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.nav-links a:hover {
+  text-decoration: underline;
+}
+
+/* Page Heading */
+h2 {
+  text-align: center;
+  margin-top: 30px;
+  color: #1e3a8a;
+  font-size: 24px;
+}
+
+/* Map container */
+#map {
+  height: 600px;
+  width: 90%;
+  margin: 30px auto;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-links {
+    margin-top: 10px;
+  }
+
+  #map {
+    width: 95%;
+    height: 500px;
+  }
+}

@@ -1,0 +1,152 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f8f9fb;
+}
+
+/* Navbar */
+.navbar {
+  background-color: white;
+  padding: 6px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  height: 50px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  height: 70px;  
+}
+
+.logo img {
+  width: auto;
+  max-width: 100px;
+  object-fit: contain;
+  display: block;
+}
+
+.nav-links a {
+  margin-left: 25px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.nav-links a:hover {
+  text-decoration: underline;
+}
+
+/* Container */
+.main-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 28px;
+  color: #1e3a8a;
+  margin-bottom: 10px;
+}
+
+p {
+  margin: 6px 0;
+  color: #333;
+}
+
+.status {
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.status.Open {
+  background-color: #fff4e5;
+  color: #d97706;
+}
+
+.status.Resolved {
+  background-color: #e0fce0;
+  color: #15803d;
+}
+
+.status.InProgress {
+  background-color: #e0e7ff;
+  color: #1e3a8a;
+}
+
+.gallery {
+  margin-top: 20px;
+}
+
+.gallery img {
+  margin: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Map */
+#map {
+  height: 300px;
+  margin-top: 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* Comments */
+#comments {
+  margin-top: 40px;
+}
+
+#comment-list {
+  list-style: none;
+  padding: 0;
+}
+
+#comment-list li {
+  margin-bottom: 15px;
+}
+
+.reply-toggle {
+  font-size: 13px;
+  color: #1e3a8a;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.reply-form {
+  margin-left: 20px;
+  margin-top: 10px;
+}
+
+.reply-form textarea,
+#c-form textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.reply-form button,
+#c-form button {
+  background-color: #1e3a8a;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.reply-form button:hover,
+#c-form button:hover {
+  background-color: #162c6b;
+}

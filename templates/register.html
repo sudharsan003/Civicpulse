@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Civics Pulse - Register</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <img src="{% static 'images/signup-illustration.png' %}" alt="Signup" class="city-image">
+    </div>
+    <div class="right">
+      <div class="form-box">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo"/>
+        <h2>Civics Pulse</h2>
+        <form method="POST">
+          {% csrf_token %}
+          {% if messages %}
+            {% for message in messages %}
+              <p style="color: red;">{{ message }}</p>
+            {% endfor %}
+          {% endif %}
+          <input type="text" name="username" placeholder="username" required />
+          <input type="email" name="email" placeholder="Email" required />
+          <input type="password" name="password" placeholder="Password" required />
+          <input type="password" name="confirm_password" placeholder="Confirm Password" required />
+
+          <button type="submit">Sign up</button>
+        </form>
+        <p class="bottom-text">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <h2>Register</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Register</button>
+</form>
+<p>Already have an account? <a href="{% url 'login' %}">Login</a></p> -->

@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reported Issues - Civics Pulse</title>
+  <link rel="stylesheet" href="{% static 'css/my_issue_style.css' %}">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">Civics Pulse</div>
+    <nav class="nav-links">
+      <a href="{% url 'issue_list' %}">Home</a>
+      <a href="{% url 'submit_issue' %}">Report Issue</a>
+      <a href="{% url 'issue_map' %}">Map</a>
+      <a href="{% url 'logout' %}">Logout</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-text">
+      <h1>Recently Reported<br>Issues</h1>
+    </div>
+    <div class="hero-image">
+      <img src="{% static 'images/my_issue.png' %}" alt="Illustration" />
+    </div>
+  </section>
+
+  <!-- Issue List -->
+  <div class="issues-container">
+    {% for issue in issues %}
+      <div class="issue-card">
+        <div class="issue-details">
+          <h3>{{ issue.title }}</h3>
+          <p>{{ issue.description }}</p>
+          <p><strong>📍 Location:</strong> {{ issue.location }}</p>
+          <p><strong>🕒 Submitted:</strong> {{ issue.created_at|date:"d M Y H:i" }}</p>
+        </div>
+        <div class="issue-status">
+          {% if issue.status == 'Resolved' %}
+            <span class="badge resolved">Resolved</span>
+          {% elif issue.status == 'In Progress' %}
+            <span class="badge in-progress">Under Review</span>
+          {% else %}
+            <span class="badge open">Open</span>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+</body>
+</html>

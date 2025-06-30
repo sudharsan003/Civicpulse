@@ -1,0 +1,347 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CivicPulse – Reported Issues</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="{% static 'css/issue_list.css' %}">
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+  <div class="navbar-left">
+    <img src="{% static 'images/logo.png' %}" alt="CivicPulse Logo" class="logo-img" />
+  </div>
+  <nav class="navbar-right">
+    <a href="{% url 'submit_issue' %}">Report Issue</a>
+    <a href="{% url 'my_issues' %}">My Reports</a>
+    <a href="{% url 'issue_map' %}">Map</a>
+    <a href="{% url 'logout' %}">Logout</a>
+  </nav>
+</header>
+
+<!-- Welcome Section -->
+<section class="welcome-section">
+  <div class="welcome-left">
+    <img src="{% static 'images/character.png' %}" alt="Illustration" />
+  </div>
+  <div class="welcome-right">
+    <h1>Welcome to <span class="highlight">Civic Pulse!</span></h1>
+    <p class="subtext">Report and track civic issues in your community.</p>
+    <a href="{% url 'submit_issue' %}" class="cta-btn">Report an Issue</a>
+  </div>
+</section>
+
+<!-- Filter Bar -->
+<section class="issues-wrapper">
+  <div class="filter-bar">
+    <div class="filter-container">
+      <input type="text" id="searchInput" name="q" value="{{ keyword }}" placeholder="Search title, description, user, location">
+
+      <select id="categorySelect" name="category">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat.id }}" {% if cat.id|stringformat:"s" == selected_category %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+
+      <select id="statusSelect" name="status">
+        <option value="">All Status</option>
+        <option value="Open" {% if selected_status == "Open" %}selected{% endif %}>Open</option>
+        <option value="In Progress" {% if selected_status == "In Progress" %}selected{% endif %}>In Progress</option>
+        <option value="Resolved" {% if selected_status == "Resolved" %}selected{% endif %}>Resolved</option>
+      </select>
+
+      <label for="fromDate">From:</label>
+      <input type="date" id="fromDate" name="from" value="{{ from_date }}">
+      
+      <label for="toDate">To:</label>
+      <input type="date" id="toDate" name="to" value="{{ to_date }}">
+
+      <button type="button" id="filterBtn">Filter</button>
+      <button type="button" id="clearFilters">Clear</button>
+    </div>
+  </div>
+
+  <!-- Loading indicator -->
+  <div id="loadingIndicator" style="display: none;">
+    <p>Loading...</p>
+  </div>
+
+  <!-- Issues Container -->
+  <div id="issuesContainer">
+    {% for issue in issues %}
+      {% if forloop.first or forloop.counter0|divisibleby:2 %}<div class="issues-row">{% endif %}
+      <div class="issue-block">
+        <div class="issue-header">
+          <h3><a href="{% url 'issue_detail' issue.id %}" class="issue-title-link">
+          {{ issue.title }}
+          </a></h3>
+          {% if issue.status == 'Resolved' %}
+            <span class="badge resolved">Resolved</span>
+          {% elif issue.status == 'In Progress' %}
+            <span class="badge in-progress">Under Review</span>
+          {% else %}
+            <span class="badge open">Open</span>
+          {% endif %}
+        </div>
+
+        {% if issue.category %}
+          <p class="card-label"><strong>Category:</strong> {{ issue.category.name }}</p>
+        {% endif %}
+        <p class="card-label"><strong>Location:</strong> {{ issue.location }}</p>
+        <p class="card-label"><strong>Reported by:</strong> {{ issue.created_by.username }} • {{ issue.created_at|date:"d M Y H:i" }}</p>
+        <p class="card-desc">{{ issue.description }}</p>
+
+        {% if issue.images.all %}
+          <div class="image-gallery">
+            {% for img in issue.images.all %}
+              <img src="{{ img.image.url }}" alt="Issue Image" class="gallery-image">
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="upvote-box">
+          <span class="upvote-count" id="count-{{ issue.id }}">👍 {{ issue.upvotes.count }}</span>
+          {% if user.is_authenticated %}
+            <a href="javascript:void(0);"
+               class="upvote-btn"
+               data-issue-id="{{ issue.id }}"
+               id="btn-{{ issue.id }}"
+               data-upvoted="{% if user in issue.upvotes.all %}true{% else %}false{% endif %}">
+               {% if user in issue.upvotes.all %}Upvoted ✅{% else %}Upvote{% endif %}
+            </a>
+          {% endif %}
+        </div>
+
+        <!-- Comment Section -->
+        <div class="comment-section" id="comments-{{ issue.id }}">
+          <h4>Comments</h4>
+          <ul class="comment-thread">
+            {% for comment in issue.comments.all %}
+              {% if not comment.parent %}
+                <li id="comment-{{ comment.id }}">
+                  <strong>{{ comment.author.username }}</strong>: {{ comment.text }}
+                  <ul class="replies" id="replies-{{ comment.id }}">
+                    {% for reply in comment.replies.all %}
+                      <li id="comment-{{ reply.id }}"><strong>{{ reply.author.username }}</strong>: {{ reply.text }}</li>
+                    {% endfor %}
+                  </ul>
+
+                  {% if user.is_authenticated %}
+                    <a href="javascript:void(0);" class="reply-toggle" data-id="{{ comment.id }}">Reply</a>
+                    <form class="reply-form" id="reply-form-{{ comment.id }}" data-issue="{{ issue.id }}" data-parent="{{ comment.id }}" style="display:none;">
+                      {% csrf_token %}
+                      <textarea name="text" required placeholder="Your reply..."></textarea>
+                      <button type="submit" class="comment-btn">Submit Reply</button>
+                    </form>
+                  {% endif %}
+                </li>
+              {% endif %}
+            {% empty %}
+              <li>No comments yet.</li>
+            {% endfor %}
+          </ul>
+
+          {% if user.is_authenticated %}
+            <form class="comment-form" id="comment-form-{{ issue.id }}" data-issue="{{ issue.id }}">
+              {% csrf_token %}
+              <textarea name="text" placeholder="Add a comment..." required></textarea>
+              <button type="submit" class="comment-btn">Submit Comment</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+      {% if forloop.last or forloop.counter|divisibleby:2 %}</div>{% endif %}
+    {% empty %}
+      <p class="no-issues">No issues reported yet.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- CSRF Setup for AJAX -->
+<script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  const csrftoken = getCookie('csrftoken');
+
+  $.ajaxSetup({
+    headers: { 'X-CSRFToken': csrftoken }
+  });
+</script>
+
+<!-- Updated AJAX Script - Manual Filter Only -->
+<script>
+$(document).ready(function() {
+  
+  function performSearch() {
+    const searchData = {
+      'q': $('#searchInput').val(),
+      'category': $('#categorySelect').val(),
+      'status': $('#statusSelect').val(),
+      'from': $('#fromDate').val(),
+      'to': $('#toDate').val()
+    };
+    
+    // Validate date range
+    const fromDate = $('#fromDate').val();
+    const toDate = $('#toDate').val();
+    
+    if (fromDate && toDate && fromDate > toDate) {
+      alert('From date cannot be later than To date. Please check your date range.');
+      return;
+    }
+    
+    $('#loadingIndicator').show();
+    $('#issuesContainer').hide();
+    
+    $.ajax({
+      url: "{% url 'issue_list' %}",
+      type: 'GET',
+      data: searchData,
+      success: function(response) {
+        const newContent = $(response).find('#issuesContainer').html();
+        $('#issuesContainer').html(newContent);
+        $('#loadingIndicator').hide();
+        $('#issuesContainer').show();
+        bindEventHandlers();
+      },
+      error: function() {
+        alert('Error loading results. Please try again.');
+        $('#loadingIndicator').hide();
+        $('#issuesContainer').show();
+      }
+    });
+  }
+  
+  // Prevent default form submission
+  $(document).on('submit', 'form', function(e) {
+    if ($(this).hasClass('comment-form') || $(this).hasClass('reply-form')) {
+      return; // Allow comment forms to submit
+    }
+    e.preventDefault();
+  });
+  
+  // Only search when Filter button is clicked
+  $('#filterBtn').on('click', function(e) {
+    e.preventDefault();
+    performSearch();
+  });
+  
+  // Allow Enter key in search input to trigger filter
+  $('#searchInput').on('keypress', function(e) {
+    if (e.which === 13) { // Enter key
+      e.preventDefault();
+      performSearch();
+    }
+  });
+  
+  // Clear filters
+  $('#clearFilters').on('click', function(e) {
+    e.preventDefault();
+    $('#searchInput').val('');
+    $('#categorySelect').val('');
+    $('#statusSelect').val('');
+    $('#fromDate').val('');
+    $('#toDate').val('');
+    performSearch(); // Auto-search after clearing
+  });
+  
+  // Date validation on change
+  $('#fromDate, #toDate').on('change', function() {
+    const fromDate = $('#fromDate').val();
+    const toDate = $('#toDate').val();
+    
+    if (fromDate && toDate && fromDate > toDate) {
+      $(this).css('border', '2px solid red');
+      alert('From date cannot be later than To date.');
+    } else {
+      $('#fromDate, #toDate').css('border', '');
+    }
+  });
+  
+  function bindEventHandlers() {
+    $('.upvote-btn').off('click').on('click', function(e) {
+      e.preventDefault();
+      const btn = $(this);
+      const issueId = btn.data('issue-id');
+      const isUpvoted = btn.data('upvoted') === true || btn.data('upvoted') === 'true';
+
+      $.get("/upvote/" + issueId + "/")
+        .done(function(data) {
+          $("#count-" + issueId).text("👍 " + data.votes);
+          btn.text(isUpvoted ? "Upvote" : "Upvoted ✅");
+          btn.data('upvoted', !isUpvoted);
+        })
+        .fail(function() {
+          alert("Failed to upvote. Try again later.");
+        });
+    });
+
+    $('.reply-toggle').off('click').on('click', function() {
+      const id = $(this).data('id');
+      $('#reply-form-' + id).toggle();
+    });
+
+    $('.comment-form, .reply-form').off('submit').on('submit', function(e) {
+      e.preventDefault();
+      const form = $(this);
+      const issueId = form.data('issue');
+      const parentId = form.data('parent') || '';
+
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'ajax_post_comment' %}",
+        data: form.serialize() + `&parent_id=${parentId}&issue_id=${issueId}`,
+        success: function(res) {
+          if (res.parent_id) {
+            const html = `<li id="comment-${res.id}"><strong>${res.author}</strong>: ${res.text}</li>`;
+            $('#replies-' + res.parent_id).append(html);
+            $('#reply-form-' + res.parent_id).hide().find('textarea').val('');
+          } else {
+            $(`#comments-${issueId} .comment-thread`).append(`
+              <li id="comment-${res.id}">
+                <strong>${res.author}</strong>: ${res.text}
+                <ul class="replies" id="replies-${res.id}"></ul>
+                {% if user.is_authenticated %}
+                  <a href="javascript:void(0);" class="reply-toggle" data-id="${res.id}">Reply</a>
+                  <form class="reply-form" id="reply-form-${res.id}" data-issue="${issueId}" data-parent="${res.id}" style="display:none;">
+                    {% csrf_token %}
+                    <textarea name="text" required placeholder="Your reply..."></textarea>
+                    <button type="submit" class="comment-btn">Submit Reply</button>
+                  </form>
+                {% endif %}
+              </li>
+            `);
+            $('#comment-form-' + issueId).find('textarea').val('');
+          }
+          // Re-bind event handlers for new elements
+          bindEventHandlers();
+        },
+        error: function() {
+          alert("Failed to post comment. Try again.");
+        }
+      });
+    });
+  }
+  
+  bindEventHandlers();
+});
+</script>
+
+</body>
+</html>

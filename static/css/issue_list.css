@@ -1,0 +1,569 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f5f7fb;
+  color: #333;
+  margin: 0;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background: white;
+  border-bottom: 1px solid #ddd;
+}
+
+.logo-img {
+  height: 50px;
+}
+
+.navbar-right a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #1e3a8a;
+  font-weight: 500;
+}
+
+.navbar-right a:hover {
+  text-decoration: underline;
+}
+
+/* Welcome Section */
+.welcome-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 50px 10%;
+  background: #eaf0ff;
+}
+
+.welcome-left img {
+  max-width: 360px;
+}
+
+.welcome-right h1 {
+  font-size: 36px;
+  font-weight: bold;
+  color: #1e3a8a;
+  margin-bottom: 10px;
+}
+
+.highlight {
+  color: #1e3a8a;
+}
+
+.subtext {
+  color: #555;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+
+.cta-btn {
+  background: #1e3a8a;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.cta-btn:hover {
+  background: #162c6b;
+}
+
+/* Filter Bar - Updated for single line layout */
+.filter-bar {
+  background-color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin: 20px 10%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.filter-bar input,
+.filter-bar select {
+  padding: 8px 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  height: 36px;
+  box-sizing: border-box;
+}
+
+/* Search input takes more space */
+#searchInput {
+  flex: 2;
+  min-width: 200px;
+}
+
+/* Category and status selects */
+#categorySelect,
+#statusSelect {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Date inputs */
+#fromDate,
+#toDate {
+  min-width: 130px;
+}
+
+/* Date labels */
+.filter-container label {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+  white-space: nowrap;
+  margin: 0;
+}
+
+/* Filter buttons */
+.filter-bar button {
+  padding: 8px 16px;
+  background-color: #1e3a8a;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  height: 36px;
+  font-size: 14px;
+}
+
+.filter-bar button:hover {
+  background-color: #0f255c;
+}
+
+#clearFilters {
+  background-color: #6b7280;
+}
+
+#clearFilters:hover {
+  background-color: #4b5563;
+}
+
+.button {
+  background: #ddd;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  text-decoration: none;
+  color: black;
+}
+
+.button:hover {
+  background: #ccc;
+}
+
+/* Issues Wrapper - Aligned with filter bar */
+.issues-wrapper {
+  padding: 0 10% 40px 10%;
+}
+
+/* Loading indicator */
+#loadingIndicator {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+/* Issues Row - 1 Row with 2 Columns Side by Side */
+.issues-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+  background: white;
+  min-height: 400px;
+}
+
+/* Issue Block Styling */
+.issue-block {
+  padding: 20px 25px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #ccc;
+}
+
+.issue-block:last-child {
+  border-right: none;
+}
+
+/* Title + Badge in Row */
+.issue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.issue-header h3 {
+  color: #1e3a8a;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.issue-title-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.issue-title-link:hover {
+  text-decoration: underline;
+}
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge.open {
+  background-color: #e8f0fe;
+  color: #1a73e8;
+}
+
+.badge.in-progress {
+  background-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.badge.resolved {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.card-label {
+  font-size: 14px;
+  margin: 5px 0;
+  color: #666;
+}
+
+.card-label strong {
+  color: #333;
+}
+
+.card-desc {
+  font-size: 14px;
+  margin: 10px 0;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* Priority Tags */
+.priority {
+  margin-left: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.priority.high {
+  color: #dc2626;
+}
+
+.priority.medium {
+  color: #ca8a04;
+}
+
+.priority.low {
+  color: #475569;
+}
+
+/* Image Gallery */
+.image-gallery {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.gallery-image {
+  width: 90px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Upvote Section */
+.upvote-box {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.upvote-count {
+  font-weight: bold;
+  font-size: 16px;
+  color: #1e3a8a;
+}
+
+.upvote-btn {
+  background-color: #e2e8f0;
+  color: #1e3a8a;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.2s ease;
+  font-size: 13px;
+}
+
+.upvote-btn:hover {
+  background-color: #cbd5e0;
+}
+
+/* Comments Section */
+.comment-section {
+  margin-top: 15px;
+  flex-grow: 1;
+}
+
+.comment-section h4 {
+  font-size: 14px;
+  color: #1e3a8a;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.comment-section ul {
+  list-style: disc;
+  padding-left: 20px;
+  font-size: 14px;
+  margin: 8px 0;
+}
+
+.comment-section li {
+  margin-bottom: 4px;
+  color: #555;
+}
+
+.comment-thread {
+  list-style: none;
+  padding-left: 0;
+}
+
+.comment-thread li {
+  margin-bottom: 8px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.replies {
+  list-style: none;
+  padding-left: 20px;
+  margin-top: 8px;
+}
+
+.replies li {
+  background: #e9ecef;
+  margin-bottom: 4px;
+}
+
+.reply-toggle {
+  color: #1e3a8a;
+  text-decoration: none;
+  font-size: 12px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.reply-toggle:hover {
+  text-decoration: underline;
+}
+
+.reply-form {
+  margin-top: 8px;
+}
+
+/* Comment Form */
+.comment-section form {
+  margin-top: 10px;
+}
+
+.comment-section form p {
+  margin: 5px 0;
+}
+
+.comment-section form label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.comment-section form textarea {
+  width: 100%;
+  max-width: 300px;
+  height: 60px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.comment-btn {
+  margin-top: 8px;
+  background: #1e3a8a;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s ease;
+}
+
+.comment-btn:hover {
+  background: #162c6b;
+}
+
+/* No Issues Message */
+.no-issues {
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+  margin-top: 40px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .filter-container {
+    gap: 8px;
+  }
+  
+  #searchInput {
+    min-width: 180px;
+  }
+  
+  #categorySelect,
+  #statusSelect {
+    min-width: 110px;
+  }
+  
+  #fromDate,
+  #toDate {
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 992px) {
+  .filter-bar {
+    margin: 20px 5%;
+  }
+  
+  .issues-wrapper {
+    padding: 0 5% 40px 5%;
+  }
+  
+  .filter-container {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  #searchInput {
+    flex: 1 1 100%;
+    min-width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .filter-container > *:not(#searchInput) {
+    flex: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .issues-row {
+    grid-template-columns: 1fr;
+  }
+
+  .issue-block {
+    border-right: none;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .issue-block:last-child {
+    border-bottom: none;
+  }
+
+  .welcome-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px 5%;
+  }
+
+  .welcome-left {
+    margin-bottom: 20px;
+  }
+
+  .navbar {
+    padding: 10px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navbar-right {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .navbar-right a {
+    margin-left: 0;
+  }
+  
+  .filter-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-container > * {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .filter-container > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .issues-wrapper {
+    padding: 20px 5%;
+  }
+
+  .welcome-right h1 {
+    font-size: 28px;
+  }
+
+  .gallery-image {
+    width: 70px;
+    height: 55px;
+  }
+
+  .comment-section form textarea {
+    max-width: 100%;
+  }
+}
