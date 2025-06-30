@@ -1,5 +1,5 @@
 from django.urls import path
-from civicpulse import views
+from issues import views
 
 
 urlpatterns = [
